@@ -1335,7 +1335,17 @@
                             points: [{x:-1, y:4}, {x:3, y:1}, {x:1, y:0}, {x:4, y:-4}, {x:-2, y:-1}, {x:0, y:0}, {x:-3, y:4}]
                         }
                     ];
-                    let chosen = patterns[Math.floor(Math.random() * patterns.length)];
+                    let chosen;
+                    if (difficulty === 'easy') {
+                        // 번개 (7개 점, 단순 정수)
+                        chosen = patterns[2];
+                    } else if (difficulty === 'medium') {
+                        // 별 (11개 점, 정수)
+                        chosen = patterns[0];
+                    } else {
+                        // 열쇠 (16개 점, 0.5단위 소수점 및 복잡한 회로)
+                        chosen = patterns[1];
+                    }
                     return {
                         patternName: chosen.name,
                         points: chosen.points
