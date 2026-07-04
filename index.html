@@ -1677,6 +1677,7 @@
                     },
                     scores: {} // { easy: 95, medium: 88, hard: 92 } 형태의 최종 스코어 보존
                 };
+                this.m2Word = "";
             }
 
             generateSessionId() {
@@ -1721,6 +1722,7 @@
                                 sNo.value = this.session.studentNo || "";
                                 sName.value = this.session.studentName || "";
                             }
+                            this.m2Word = parsed.m2Word || "";
                         }
                         
                         // Sync inputs in Modal UI
@@ -1755,7 +1757,8 @@
                     timeElapsed: this.timeElapsed,
                     failCount: this.failCount,
                     coordTheme: this.coordTheme,
-                    session: this.session // 세션 데이터 저장
+                    session: this.session, // 세션 데이터 저장
+                    m2Word: this.m2Word
                 };
                 localStorage.setItem('ai_lab_escape_save', JSON.stringify(data));
             }
@@ -2485,13 +2488,8 @@
 
                 // If currently on Mission 2 (Zone 2), store the generated random word in state and save settings
                 if (this.currentMissionIndex === 1 && this.currentMissionData.word) {
-                    const saved = localStorage.getItem('ai_lab_escape_save');
-                    let parsed = {};
-                    if (saved) {
-                        try { parsed = JSON.parse(saved); } catch(e){}
-                    }
-                    parsed.m2Word = this.currentMissionData.word;
-                    localStorage.setItem('ai_lab_escape_save', JSON.stringify(parsed));
+                    this.m2Word = this.currentMissionData.word;
+                    this.saveSettings();
                 }
 
                 // Story/Item dependence gate
@@ -3410,8 +3408,7 @@
                 alertText3.setAttribute("style", "font-size: 11px; fill: var(--neon-cyan); font-weight: bold; font-family: var(--font-mono);");
                 alertText3.setAttribute("text-anchor", "middle");
                 // Remind the user of the word from M2 in case they forgot, to avoid frustration, or keep it as puzzle
-                const savedData = JSON.parse(localStorage.getItem('ai_lab_escape_save'));
-                const debugWord = savedData ? (savedData.m2Word || "GRID") : "GRID";
+                const debugWord = this.m2Word || "GRID";
                 alertText3.textContent = `(보안 단말기 복원 로그: **** -> ${debugWord})`;
                 txtGroup.appendChild(alertText3);
 
@@ -3452,20 +3449,7 @@
 
             validateFinalMission() {
                 const inputVal = document.getElementById('final-passwd-input').value.trim().toUpperCase();
-                
-                // M2 word dynamically fetched from localStorage or active config
-                // Since M2 data is randomized, we need to ensure we validate against the correct word.
-                // We'll read the saved state for validation robustness.
-                const saved = localStorage.getItem('ai_lab_escape_save');
-                let targetWord = "GRID";
-                if (saved) {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        // We will store the generated M2 word in localstorage on M2 generation
-                        targetWord = parsed.m2Word || "GRID";
-                    } catch(e){}
-                }
-
+                const targetWord = this.m2Word || "GRID";
                 // Final passcode = M2 Word + "5" (5 chips completed)
                 const correctPass = `${targetWord}5`;
                 return inputVal === correctPass;
