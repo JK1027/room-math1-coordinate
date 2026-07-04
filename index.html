@@ -849,6 +849,35 @@
             outline: none;
             box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
         }
+
+        /* NPC 대화 클릭 지시자 및 호흡 애니메이션 */
+        @keyframes dialog-blink {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; text-shadow: var(--glow-cyan); }
+        }
+        .dialog-cursor {
+            display: inline-block;
+            margin-left: 6px;
+            color: var(--neon-cyan);
+            animation: dialog-blink 1.2s infinite;
+            font-family: var(--font-cyber);
+            font-weight: bold;
+        }
+
+        @keyframes border-pulse {
+            0%, 100% { 
+                border-color: var(--border-neon);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 240, 255, 0.05);
+            }
+            50% { 
+                border-color: rgba(0, 240, 255, 0.8);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.35), inset 0 0 15px rgba(0, 240, 255, 0.15);
+            }
+        }
+        .npc-box-waiting {
+            animation: border-pulse 1.8s infinite ease-in-out;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -937,7 +966,7 @@
                 <div id="console-panel">
                     
                     <!-- NPC CHAT BOX -->
-                    <div class="glass-panel" style="flex: 0 0 auto;">
+                    <div class="glass-panel" style="flex: 0 0 auto;" id="npc-chat-panel">
                         <div class="npc-box">
                             <div class="npc-avatar" id="npc-avatar-box">
                                 <span style="font-size: 1.8rem;">🤖</span>
@@ -2325,14 +2354,16 @@
             speak(npcName, avatarStr, dialogs, onComplete) {
                 if (this.typingTimeout) clearTimeout(this.typingTimeout);
 
-                const nameLabel = document.getElementById('npc-name-label');
-                let dialogText = document.getElementById('console-dialog-text');
-                const avatarBox = document.getElementById('npc-avatar-box');
+                const chatPanel = document.getElementById('npc-chat-panel');
+                if (!chatPanel) return;
 
                 // Clone element to clear all previous click listeners
-                const newDialogText = dialogText.cloneNode(true);
-                dialogText.parentNode.replaceChild(newDialogText, dialogText);
-                dialogText = newDialogText;
+                const newChatPanel = chatPanel.cloneNode(true);
+                chatPanel.parentNode.replaceChild(newChatPanel, chatPanel);
+
+                const nameLabel = newChatPanel.querySelector('#npc-name-label');
+                const dialogText = newChatPanel.querySelector('#console-dialog-text');
+                const avatarBox = newChatPanel.querySelector('#npc-avatar-box');
 
                 nameLabel.innerText = npcName;
                 avatarBox.innerHTML = `<span style="font-size: 1.8rem;">${avatarStr}</span>`;
@@ -2351,16 +2382,22 @@
                         let charIdx = 0;
                         const txt = dialogs[dIdx];
                         
+                        const showClickPrompt = () => {
+                            dialogText.innerHTML += '<span class="dialog-cursor"> ↩</span>';
+                            newChatPanel.classList.add('npc-box-waiting');
+                        };
+
                         // If dialog panel is clicked, skip typing animation
                         const skipText = () => {
                             dialogText.innerText = txt;
                             charIdx = txt.length;
-                            dialogText.removeEventListener('click', skipText);
+                            newChatPanel.removeEventListener('click', skipText);
+                            showClickPrompt();
                             setTimeout(() => {
-                                dialogText.addEventListener('click', nextSentence);
+                                newChatPanel.addEventListener('click', nextSentence);
                             }, 50);
                         };
-                        dialogText.addEventListener('click', skipText);
+                        newChatPanel.addEventListener('click', skipText);
 
                         const typeChar = () => {
                             if (charIdx < txt.length) {
@@ -2369,20 +2406,23 @@
                                 this.audio.playSFX('click');
                                 this.typingTimeout = setTimeout(typeChar, 35);
                             } else {
-                                dialogText.removeEventListener('click', skipText);
-                                dialogText.addEventListener('click', nextSentence);
+                                newChatPanel.removeEventListener('click', skipText);
+                                showClickPrompt();
+                                newChatPanel.addEventListener('click', nextSentence);
                             }
                         };
 
                         const nextSentence = () => {
                             this.audio.playSFX('click');
-                            dialogText.removeEventListener('click', nextSentence);
+                            newChatPanel.removeEventListener('click', nextSentence);
+                            newChatPanel.classList.remove('npc-box-waiting');
                             dIdx++;
                             typeSentence();
                         };
 
                         typeChar();
                     } else {
+                        newChatPanel.classList.remove('npc-box-waiting');
                         if (onComplete) onComplete();
                     }
                 };
