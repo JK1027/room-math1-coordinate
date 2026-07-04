@@ -2244,8 +2244,8 @@
                     
                     if (clientX === undefined || clientY === undefined) return;
                     
-                    const xPx = clientX - rect.left;
-                    const yPx = clientY - rect.top;
+                    const xPx = (clientX - rect.left) * (500 / rect.width);
+                    const yPx = (clientY - rect.top) * (500 / rect.height);
 
                     // Calculate mathematical coordinate
                     const rawX = (xPx - center) / step;
@@ -2262,9 +2262,9 @@
                     const xVal = Math.max(minVal, Math.min(maxVal, Math.round(rawX / snapStep) * snapStep));
                     const yVal = Math.max(minVal, Math.min(maxVal, Math.round(rawY / snapStep) * snapStep));
 
-                    // Move tooltip
-                    tooltip.style.left = `${xPx}px`;
-                    tooltip.style.top = `${yPx}px`;
+                    // Move tooltip (use screen pixels, not scaled viewBox pixels)
+                    tooltip.style.left = `${clientX - rect.left}px`;
+                    tooltip.style.top = `${clientY - rect.top}px`;
                     tooltip.style.display = 'block';
                     tooltip.innerText = `(${xVal}, ${yVal})`;
 
@@ -2689,8 +2689,8 @@
                     const rect = svg.getBoundingClientRect();
                     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                     const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                    const xPx = clientX - rect.left;
-                    const yPx = clientY - rect.top;
+                    const xPx = (clientX - rect.left) * (500 / rect.width);
+                    const yPx = (clientY - rect.top) * (500 / rect.height);
 
                     const center = 250;
                     const step = 50;
@@ -2919,8 +2919,8 @@
                     const rect = svg.getBoundingClientRect();
                     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                     const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                    const xPx = clientX - rect.left;
-                    const yPx = clientY - rect.top;
+                    const xPx = (clientX - rect.left) * (500 / rect.width);
+                    const yPx = (clientY - rect.top) * (500 / rect.height);
 
                     const xVal = Math.round((xPx - center) / step);
                     const yVal = Math.round(-(yPx - center) / step);
@@ -3088,8 +3088,8 @@
                     const rect = svg.getBoundingClientRect();
                     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                     const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                    const xPx = clientX - rect.left;
-                    const yPx = clientY - rect.top;
+                    const xPx = (clientX - rect.left) * (500 / rect.width);
+                    const yPx = (clientY - rect.top) * (500 / rect.height);
 
                     const center = 250;
                     const step = 50;
@@ -3219,9 +3219,11 @@
                     const rect = svg.getBoundingClientRect();
                     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                     const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                    const xPx = clientX - rect.left;
-                    const yPx = clientY - rect.top;
+                    const xPx = (clientX - rect.left) * (500 / rect.width);
+                    const yPx = (clientY - rect.top) * (500 / rect.height);
 
+                    const center = 250;
+                    const step = 50;
                     const hasDecimals = data.points.some(p => p.x % 1 !== 0 || p.y % 1 !== 0);
                     const snapStep = hasDecimals ? 0.5 : 1;
                     const xVal = Math.round(((xPx - center) / step) / snapStep) * snapStep;
