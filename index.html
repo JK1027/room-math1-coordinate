@@ -2286,8 +2286,15 @@
             }
 
             bindEvents() {
+                // null-safe 이벤트 바인딩 헬퍼
+                const on = (id, evt, fn) => {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener(evt, fn);
+                    else console.warn(`bindEvents: element not found → #${id}`);
+                };
+
                 // Coordinate Theme Toggle
-                document.getElementById('coord-theme-btn').addEventListener('click', () => {
+                on('coord-theme-btn', 'click', () => {
                     this.audio.playSFX('click');
                     this.coordTheme = this.coordTheme === 'dark' ? 'light' : 'dark';
                     this.saveSettings();
@@ -2295,25 +2302,27 @@
                 });
 
                 // UI Audio click triggers
-                document.getElementById('audio-toggle-btn').addEventListener('click', () => {
+                on('audio-toggle-btn', 'click', () => {
                     const isMuted = this.audio.toggleMute();
-                    document.getElementById('audio-toggle-btn').innerHTML = isMuted ? '🔇' : '🔊';
+                    const btn = document.getElementById('audio-toggle-btn');
+                    if (btn) btn.innerHTML = isMuted ? '🔇' : '🔊';
                     this.audio.playSFX('click');
                 });
 
                 // Start game button
-                document.getElementById('start-game-btn').addEventListener('click', () => {
+                on('start-game-btn', 'click', () => {
                     this.audio.init();
                     if (this.audio.muted) {
                         this.audio.toggleMute();
-                        document.getElementById('audio-toggle-btn').innerHTML = '🔊';
+                        const btn = document.getElementById('audio-toggle-btn');
+                        if (btn) btn.innerHTML = '🔊';
                     }
                     this.audio.playSFX('click');
                     this.startGame();
                 });
 
                 // Fullscreen
-                document.getElementById('fullscreen-btn').addEventListener('click', () => {
+                on('fullscreen-btn', 'click', () => {
                     this.audio.playSFX('click');
                     if (!document.fullscreenElement) {
                         document.documentElement.requestFullscreen().catch(err => {
@@ -2325,24 +2334,25 @@
                 });
 
                 // Reset Mission Button
-                document.getElementById('reset-mission-btn').addEventListener('click', () => {
+                on('reset-mission-btn', 'click', () => {
                     this.audio.playSFX('click');
                     this.resetMission();
                 });
 
                 // Submit Mission Button
-                document.getElementById('submit-mission-btn').addEventListener('click', () => {
+                on('submit-mission-btn', 'click', () => {
                     this.validateMission();
                 });
 
                 // Hint toggle button
-                document.getElementById('hint-toggle-btn').addEventListener('click', () => {
+                on('hint-toggle-btn', 'click', () => {
                     this.audio.playSFX('click');
                     if (!this.allowHint) {
                         alert("교사용 옵션에 의해 힌트가 비활성화되어 있습니다.");
                         return;
                     }
                     const hintBox = document.getElementById('hint-display-box');
+                    if (!hintBox) return;
                     if (hintBox.style.display === 'block') {
                         hintBox.style.display = 'none';
                     } else {
@@ -2352,7 +2362,8 @@
 
                         const m = MISSION_CONFIG[this.currentMissionIndex];
                         if (m) {
-                            document.getElementById('hint-text-span').innerText = m.hints[this.difficulty];
+                            const hintSpan = document.getElementById('hint-text-span');
+                            if (hintSpan) hintSpan.innerText = m.hints[this.difficulty];
                             hintBox.style.display = 'block';
                         } else if (this.currentMissionIndex === 8) {
                             // Final mission hint
@@ -2364,42 +2375,51 @@
                                     targetWord = parsed.m2Word || "GRID";
                                 } catch(e){}
                             }
-                            document.getElementById('hint-text-span').innerText = `최종 탈출 암호는 [보안 단어] + [복구 구역 수(8)] 입니다. 복구된 보안 단어는 '${targetWord}' 이며, 최종 비밀번호는 '${targetWord}8' 입니다.`;
+                            const hintSpan = document.getElementById('hint-text-span');
+                            if (hintSpan) hintSpan.innerText = `최종 탈출 암호는 [보안 단어] + [복구 구역 수(8)] 입니다. 복구된 보안 단어는 '${targetWord}' 이며, 최종 비밀번호는 '${targetWord}8' 입니다.`;
                             hintBox.style.display = 'block';
                         }
                     }
                 });
 
                 // Teacher Settings Modal Events
-                document.getElementById('open-teacher-setup-btn').addEventListener('click', () => {
+                on('open-teacher-setup-btn', 'click', () => {
                     this.audio.playSFX('click');
                     const pwd = prompt("교사용 비밀번호를 입력해 주세요 (초기화 코드: 1234 또는 teacher):");
                     if (pwd === "1234" || pwd === "teacher" || pwd === "") {
-                        document.getElementById('teacher-setup-modal').classList.add('active');
+                        const modal = document.getElementById('teacher-setup-modal');
+                        if (modal) modal.classList.add('active');
                     } else {
                         alert("비밀번호가 올바르지 않습니다.");
                     }
                 });
 
-                document.getElementById('close-teacher-modal-btn').addEventListener('click', () => {
+                on('close-teacher-modal-btn', 'click', () => {
                     this.audio.playSFX('click');
-                    document.getElementById('teacher-setup-modal').classList.remove('active');
+                    const modal = document.getElementById('teacher-setup-modal');
+                    if (modal) modal.classList.remove('active');
                 });
 
-                document.getElementById('setting-use-timer').addEventListener('change', (e) => {
+                on('setting-use-timer', 'change', (e) => {
                     const timerWrapper = document.getElementById('timer-limit-wrapper');
-                    timerWrapper.style.display = e.target.checked ? 'flex' : 'none';
+                    if (timerWrapper) timerWrapper.style.display = e.target.checked ? 'flex' : 'none';
                 });
 
-                document.getElementById('btn-save-settings').addEventListener('click', () => {
+                on('btn-save-settings', 'click', () => {
                     this.audio.playSFX('click');
-                    this.difficulty = document.getElementById('setting-difficulty').value;
-                    this.useTimer = document.getElementById('setting-use-timer').checked;
-                    this.timerLimit = parseInt(document.getElementById('setting-timer-limit').value) || 1200;
-                    this.allowHint = document.getElementById('setting-allow-hint').checked;
-                    this.randomize = document.getElementById('setting-randomize').checked;
+                    const diff = document.getElementById('setting-difficulty');
+                    const useTimer = document.getElementById('setting-use-timer');
+                    const timerLimit = document.getElementById('setting-timer-limit');
+                    const allowHint = document.getElementById('setting-allow-hint');
+                    const randomize = document.getElementById('setting-randomize');
+                    if (diff) this.difficulty = diff.value;
+                    if (useTimer) this.useTimer = useTimer.checked;
+                    if (timerLimit) this.timerLimit = parseInt(timerLimit.value) || 1200;
+                    if (allowHint) this.allowHint = allowHint.checked;
+                    if (randomize) this.randomize = randomize.checked;
                     this.saveSettings();
-                    document.getElementById('teacher-setup-modal').classList.remove('active');
+                    const modal = document.getElementById('teacher-setup-modal');
+                    if (modal) modal.classList.remove('active');
                     alert("설정이 성공적으로 저장 및 반영되었습니다.");
                     
                     if (this.isGameActive) {
@@ -2412,21 +2432,24 @@
                     }
                 });
 
-                document.getElementById('btn-force-reset').addEventListener('click', () => {
+                on('btn-force-reset', 'click', () => {
                     if (confirm("모든 게임 기록과 획득한 시스템 업적이 영구 삭제됩니다. 계속하시겠습니까?")) {
                         this.audio.playSFX('click');
                         this.resetEntireGame();
-                        document.getElementById('teacher-setup-modal').classList.remove('active');
+                        const modal = document.getElementById('teacher-setup-modal');
+                        if (modal) modal.classList.remove('active');
                         location.reload();
                     }
                 });
 
                 // Restart from Ending
-                document.getElementById('restart-game-btn').addEventListener('click', () => {
+                on('restart-game-btn', 'click', () => {
                     this.audio.playSFX('click');
                     this.resetEntireGame();
-                    document.getElementById('ending-screen').classList.remove('active');
-                    document.getElementById('intro-screen').classList.add('active');
+                    const endingScreen = document.getElementById('ending-screen');
+                    const introScreen = document.getElementById('intro-screen');
+                    if (endingScreen) endingScreen.classList.remove('active');
+                    if (introScreen) introScreen.classList.add('active');
                 });
             }
 
@@ -4627,8 +4650,15 @@
         const game = new GameManager();
 
         function initGameAndIntro() {
-            game.init();
-            
+            // game.init()이 에러를 내도 인트로 타이핑이 무조건 실행되도록 try-catch로 보호
+            let initError = null;
+            try {
+                game.init();
+            } catch(e) {
+                initError = e;
+                console.error("game.init() error:", e);
+            }
+
             // Intros dialogue initialization
             const introCutsceneText = [
                 "SYSTEM BOOT: AI Lab Mainframe Online...",
@@ -4642,6 +4672,17 @@
             const introBox = document.getElementById('intro-dialog-box');
             if (!introBox) {
                 console.error("Critical: intro-dialog-box not found in DOM.");
+                return;
+            }
+
+            // init 에러가 있으면 인트로 박스에 표시
+            if (initError) {
+                const errP = document.createElement('p');
+                errP.style.color = 'red';
+                errP.style.fontSize = '11px';
+                errP.style.wordBreak = 'break-all';
+                errP.innerText = "INIT ERROR: " + initError.message + "\n" + (initError.stack || '');
+                introBox.appendChild(errP);
                 return;
             }
             
