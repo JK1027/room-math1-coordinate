@@ -1013,11 +1013,11 @@
                 aspect-ratio: 1 / 1;
             }
 
-            /* 하단 콘솔 단일 통합 및 높이 32vh 제한 */
+            /* 하단 콘솔 단일 통합 및 높이 38vh 제한 */
             #console-panel {
                 flex: 0 0 auto;
                 height: auto;
-                max-height: 32vh;
+                max-height: 38vh;
                 display: flex;
                 flex-direction: column;
                 gap: 4px;
@@ -1077,6 +1077,7 @@
                 padding: 2px;
                 gap: 4px;
                 overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
                 display: flex;
                 flex-direction: column;
                 min-height: 0;
@@ -3223,9 +3224,9 @@
             setupItemLockScreen(requiredItem) {
                 const uiArea = document.getElementById('mission-specific-ui');
                 uiArea.innerHTML = `
-                    <div style="text-align: center; padding: 20px; border: 1px dashed var(--neon-magenta); border-radius: 8px; background: rgba(255,0,127,0.05);">
-                        <div class="neon-text-magenta" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; font-family: var(--font-cyber);">장비 연결 필요</div>
-                        <p style="font-size: 0.9rem; line-height: 1.5; opacity: 0.85;">
+                    <div style="text-align: center; padding: 10px 14px; border: 1px dashed var(--neon-magenta); border-radius: 8px; background: rgba(255,0,127,0.05);">
+                        <div class="neon-text-magenta" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 8px; font-family: var(--font-cyber);">장비 연결 필요</div>
+                        <p style="font-size: 0.85rem; line-height: 1.4; opacity: 0.85;">
                             이 시스템 단말기에 접속하려면 우측 하단의 인벤토리에서 <strong class="neon-text-cyan">[${requiredItem}]</strong> 장비를 마우스 클릭하여 기동 장치에 도킹시켜야 합니다.
                         </p>
                     </div>
