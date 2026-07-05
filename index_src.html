@@ -1664,8 +1664,8 @@
                     ],
                     hard: [
                         "상급 보안 프로토콜 경고! 레이저 격자가 고속 교차 가동 중입니다. [레이저 차단 고글] 없이는 1초도 버틸 수 없습니다!",
-                        "해커 X: '크크크, 단순한 부등식이 아니다. 대칭 변환과 대소 비교가 뒤섞인 레이저 방호벽을 뚫어 보아라!'",
-                        "NOVA: '안전 구역이 실시간으로 반전되고 있습니다. y > x 혹은 축 관련 대칭 영역에 걸리지 않는 초정밀 안전 좌표를 찾으십시오!'"
+                        "해커 X: '크크크, 단순한 부등식이 아니다. 복합 조건을 동시에 만족하는 구역을 피해보아라!'",
+                        "NOVA: '여러 개의 조건이 중첩되어 발동되고 있습니다. 사분면과 특정 좌표 범위를 꼼꼼히 확인하고 피할 수 있는 초정밀 안전 좌표를 찾으십시오!'"
                     ]
                 },
                 successDialogs: {
@@ -1685,9 +1685,9 @@
                 itemToReward: { name: "에너지 코어", icon: SVGS.core, tooltip: "연구실의 모든 대형 전원 장치를 기동시킬 수 있는 고밀도 플라즈마 코어" },
                 itemToUse: "레이저 차단 고글",
                 hints: {
-                    easy: "x > 0은 오른쪽 영역을 뜻하고, y < 0은 아래쪽 영역을 뜻합니다. 둘 다 아닌 안전한 사분면을 선택하세요.",
-                    medium: "사분면의 정의를 기억하세요! 제1사분면(+,+), 제2사분면(-,+), 제3사분면(-,-), 제4사분면(+,-)의 위치를 확인하세요.",
-                    hard: "조건 'y > x'는 y좌표가 x좌표보다 큰 영역을 의미합니다. 좌표의 대소 관계를 잘 비교하여 안전지대를 정하세요."
+                    easy: "NOVA: '먼저 레이저가 발사되는 영역이 오른쪽(+)인지 왼쪽(-)인지, 위(+)인지 아래(-)인지 확인해 보세요.'",
+                    medium: "NOVA: '사분면의 위치를 먼저 확인해 보세요.'",
+                    hard: "NOVA: (통신 불량... 스스로 여러 조건을 조합하여 안전한 구역을 찾아야 합니다.)"
                 },
                 generateMissionData: function(difficulty, randomize) {
                     const stages = [];
@@ -1726,19 +1726,28 @@
                         });
                     } else {
                         stages.push({
-                            warning: "y > x (y좌표가 x좌표보다 큰 영역) 레이저 활성화!",
-                            test: (x, y) => y <= x,
-                            hint: "y좌표가 x좌표보다 작거나 같은 곳을 고르세요."
+                            warning: "제2사분면 중에서 x좌표가 -3보다 큰 부분 레이저 활성화!",
+                            test: (x, y) => {
+                                const inLaser = (x < 0 && y > 0 && x > -3);
+                                return !inLaser;
+                            },
+                            hint: "제2사분면이면서 x축에서 -3보다 큰 구역을 제외하고 고르세요."
                         });
                         stages.push({
-                            warning: "원점 대칭 관계 중 y > -x 영역 레이저 충전!",
-                            test: (x, y) => y <= -x,
-                            hint: "y좌표가 -x보다 작거나 같은 곳을 고르세요."
+                            warning: "제4사분면 중에서 y좌표가 -2보다 작은 부분 레이저 활성화!",
+                            test: (x, y) => {
+                                const inLaser = (x > 0 && y < 0 && y < -2);
+                                return !inLaser;
+                            },
+                            hint: "제4사분면이면서 y축에서 -2보다 작은 구역을 제외하고 고르세요."
                         });
                         stages.push({
-                            warning: "x의 절대값이 y의 절대값보다 큰 영역 (|x| > |y|) 레이저 활성화!",
-                            test: (x, y) => Math.abs(x) <= Math.abs(y),
-                            hint: "y좌표의 절대값이 x좌표의 절대값보다 크거나 같은 안전지대를 고르세요."
+                            warning: "제3사분면 중에서 x좌표와 y좌표가 모두 -4보다 큰 부분 레이저 활성화!",
+                            test: (x, y) => {
+                                const inLaser = (x < 0 && y < 0 && x > -4 && y > -4);
+                                return !inLaser;
+                            },
+                            hint: "제3사분면 안쪽 구역을 피해서 안전지대를 고르세요."
                         });
                     }
                     
@@ -1833,7 +1842,7 @@
                     ],
                     hard: [
                         "해커 X: '크크, 그래프까지 위조했다!'",
-                        "NOVA: 수위가 '가장 빠르게 증가하는' 구간의 기울기 값을 구하고 해당 구간을 클릭해 주십시오."
+                        "NOVA: '시작점보다 끝점의 y좌표가 가장 많이 높아진 구간'을 찾아서 클릭해 주십시오."
                     ]
                 },
                 successDialogs: {
@@ -1853,9 +1862,9 @@
                 itemToReward: { name: "냉각수 제어 칩", icon: SVGS.chip, tooltip: "원자로 냉각 장치의 상태 그래프 분석 및 작동 매개변수를 제어하는 칩" },
                 itemToUse: "마스터 액세스 키",
                 hints: {
-                    easy: "그래프의 선이 아래로 내려가는(오른쪽 아래 방향) 구간을 찾아서 터치하세요.",
-                    medium: "그래프가 가로로 평평한(y값의 변화가 없는) 구간을 찾아서 선택하세요.",
-                    hard: "가장 가파르게 올라가는 선을 찾으십시오. (기울기 = 세로 증가량 / 가로 증가량) 공식을 이용해 보세요."
+                    easy: "NOVA: '그래프의 선이 아래로 내려가는(오른쪽 아래 방향) 구간을 찾아서 터치하세요.'",
+                    medium: "NOVA: '그래프가 가로로 평평한(y값의 변화가 없는) 구간을 찾아서 선택하세요.'",
+                    hard: "NOVA: (통신 불량... 좌표의 y값을 읽고 스스로 증가량을 비교해야 합니다.)"
                 },
                 generateMissionData: function(difficulty, randomize) {
                     let points = [{x:-5, y:-2}, {x:-2, y:2}, {x:1, y:2}, {x:3, y:-3}, {x:5, y:4}];
@@ -2032,8 +2041,8 @@
                     ],
                     hard: [
                         "경보! 탈출 통제실 전역이 차단되고 있습니다! 1초라도 빨리 [도킹 어댑터]를 연결하고 해킹 우회 격자를 구성하십시오!",
-                        "해커 X: '도킹 시스템을 아예 궤도에서 이탈시켜 주마! 축 대칭 변환 조건도 이해하지 못하는 수준이라면 여기서 최후를 맞이하겠지!'",
-                        "NOVA: '안테나 칩들을 단순 배치가 아닌, 고도의 x축/y축 대칭 조건과 복합 부등식 조건의 사분면으로 전송시켜야 합니다. 극한의 상황에서도 침착하십시오!'"
+                        "해커 X: '도킹 시스템을 아예 궤도에서 이탈시켜 주마! 복잡한 좌표 조건을 해석하지 못하면 여기서 최후를 맞이하겠지!'",
+                        "NOVA: '화면에 표시된 여러 후보 위치 중, 각 안테나 칩의 복합 조건에 완벽히 일치하는 위치를 찾아 배치해야 합니다!'"
                     ]
                 },
                 successDialogs: {
@@ -2053,23 +2062,44 @@
                 itemToReward: { name: "비상 탈출 코드 카드", icon: SVGS.card, tooltip: "최종 잠금 해제에 필요한 수학적 연산 공식과 마스터 비밀코드 힌트가 들어있습니다." },
                 itemToUse: "도킹 어댑터",
                 hints: {
-                    easy: "제1사분면(+,+), 제2사분면(-,+), 제3사분면(-,-), 제4사분면(+,-)의 위치를 확인하세요.",
-                    medium: "각 칩을 조건에 맞는 영역으로 가져다 놓아야 합니다. 드래그 앤 드롭 또는 타겟 클릭 방식을 이용하세요.",
-                    hard: "축 대칭(x축 대칭은 y부호 반대, y축 대칭은 x부호 반대)의 성질을 가진 칩 배치 미션입니다."
+                    easy: "NOVA: '제1사분면(+,+), 제2사분면(-,+), 제3사분면(-,-), 제4사분면(+,-)의 위치를 확인하세요.'",
+                    medium: "NOVA: '각 칩을 조건에 맞는 영역으로 가져다 놓아야 합니다. 사분면 부호를 확인하세요.'",
+                    hard: "NOVA: (통신 불량... 화면의 후보 노드 위치들을 직접 읽고, 필요 없는 위치를 제외하며 조건에 맞는 곳을 스스로 찾아야 합니다.)"
                 },
                 generateMissionData: function(difficulty, randomize) {
-                    const suffixA = difficulty === 'hard' ? "" : " (제1사분면)";
-                    const suffixB = difficulty === 'hard' ? "" : " (제2사분면)";
-                    const suffixC = difficulty === 'hard' ? "" : " (제3사분면)";
-                    const suffixD = difficulty === 'hard' ? "" : " (제4사분면)";
-                    
-                    const chips = [
-                        { id: "chip-a", name: "송신기 Alpha", desc: "x > 0, y > 0 인 지역" + suffixA, check: (x, y) => x > 0 && y > 0 },
-                        { id: "chip-b", name: "수신기 Beta", desc: "x < 0, y > 0 인 지역" + suffixB, check: (x, y) => x < 0 && y > 0 },
-                        { id: "chip-c", name: "필터 Gamma", desc: "x < 0, y < 0 인 지역" + suffixC, check: (x, y) => x < 0 && y < 0 },
-                        { id: "chip-d", name: "서브 Orion", desc: "x > 0, y < 0 인 지역" + suffixD, check: (x, y) => x > 0 && y < 0 }
-                    ];
-                    return { chips: chips };
+                    if (difficulty === 'hard') {
+                        // 8개의 후보 노드를 미리 화면에 제시 (더미 4개 포함)
+                        const nodes = [
+                            { id: 'n1', x: -4, y: 3 }, // 2사분면, y가 큼
+                            { id: 'n2', x: -2, y: 1 }, // 2사분면, 더미
+                            { id: 'n3', x: 4, y: 0 },  // x축, 더미
+                            { id: 'n4', x: -5, y: 0 }, // x축, 원점에서 제일 멂
+                            { id: 'n5', x: 2, y: 4 },  // 1사분면, 더미
+                            { id: 'n6', x: 3, y: -2 }, // 4사분면, y가 큼
+                            { id: 'n7', x: 1, y: -4 }, // 4사분면, 더미
+                            { id: 'n8', x: 0, y: -3 }  // y축, 더미
+                        ];
+                        const chips = [
+                            { id: "chip-a", name: "송신기 Alpha", desc: "제2사분면에 있으면서 y좌표가 가장 큰 곳", targetNodeId: 'n1' },
+                            { id: "chip-b", name: "수신기 Beta", desc: "x축 위에 있는 점 중 원점에서 가장 멀리 떨어진 곳", targetNodeId: 'n4' },
+                            { id: "chip-c", name: "필터 Gamma", desc: "제4사분면에 있으면서 y좌표가 가장 큰 곳", targetNodeId: 'n6' },
+                            { id: "chip-d", name: "서브 Orion", desc: "제1사분면에 있는 점", targetNodeId: 'n5' }
+                        ];
+                        return { chips: chips, nodes: nodes };
+                    } else {
+                        const suffixA = difficulty === 'easy' ? " (제1사분면)" : "";
+                        const suffixB = difficulty === 'easy' ? " (제2사분면)" : "";
+                        const suffixC = difficulty === 'easy' ? " (제3사분면)" : "";
+                        const suffixD = difficulty === 'easy' ? " (제4사분면)" : "";
+                        
+                        const chips = [
+                            { id: "chip-a", name: "송신기 Alpha", desc: "x > 0, y > 0 인 지역" + suffixA, check: (x, y) => x > 0 && y > 0 },
+                            { id: "chip-b", name: "수신기 Beta", desc: "x < 0, y > 0 인 지역" + suffixB, check: (x, y) => x < 0 && y > 0 },
+                            { id: "chip-c", name: "필터 Gamma", desc: "x < 0, y < 0 인 지역" + suffixC, check: (x, y) => x < 0 && y < 0 },
+                            { id: "chip-d", name: "서브 Orion", desc: "x > 0, y < 0 인 지역" + suffixD, check: (x, y) => x > 0 && y < 0 }
+                        ];
+                        return { chips: chips };
+                    }
                 }
             }
         ];
@@ -3942,7 +3972,7 @@
                 let targetDesc = "";
                 if (this.difficulty === 'easy') targetDesc = "냉각수 수위가 <strong>감소(감소 구간)</strong>하고 있는 선분을 찾아서 클릭하세요.";
                 else if (this.difficulty === 'medium') targetDesc = "냉각수 수위가 <strong>일정하게 유지(변화 없음)</strong>되는 선분을 찾아서 클릭하세요.";
-                else targetDesc = "냉각수 수위가 <strong>가장 빠르게 증가(기울기가 최대)</strong>하는 선분을 찾아서 클릭하세요.";
+                else targetDesc = "냉각수 수위의 <strong>y값이 가장 크게 증가한(시작점 대비 끝점이 가장 높은)</strong> 선분을 찾아서 클릭하세요.";
 
                 uiArea.innerHTML = `
                     <div style="font-size: 0.9rem; line-height: 1.5; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border: 1px solid rgba(0,240,255,0.15)">
@@ -3966,11 +3996,13 @@
                 } else if (this.difficulty === 'medium') {
                     return seg.type === 'constant';
                 } else {
-                    let maxSlope = -Infinity;
+                    let maxIncrease = -Infinity;
                     data.segments.forEach(s => {
-                        if (s.slope > maxSlope) maxSlope = s.slope;
+                        let increase = s.p2.y - s.p1.y;
+                        if (increase > maxIncrease) maxIncrease = increase;
                     });
-                    return Math.abs(seg.slope - maxSlope) < 0.01;
+                    let currentIncrease = seg.p2.y - seg.p1.y;
+                    return Math.abs(currentIncrease - maxIncrease) < 0.01;
                 }
             }
 
@@ -4379,7 +4411,7 @@
                     let html = `
                         <div style="font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border: 1px solid rgba(0,240,255,0.15); display: flex; flex-direction: column; gap: 8px;">
                             <div class="neon-text-cyan" style="font-weight: bold;">유도 안테나 조율 및 배치:</div>
-                            <p style="font-size: 0.8rem; opacity: 0.8; line-height: 1.4;">안테나를 클릭하여 선택한 후, 격자의 목표 위치(사분면 조건 만족)를 탭해 안테나를 정렬해 주세요.</p>
+                            <p style="font-size: 0.8rem; opacity: 0.8; line-height: 1.4;">안테나를 클릭하여 선택한 후, ${this.difficulty === 'hard' ? '화면에 표시된 점선 원 후보지 중에서 조건에 맞는' : '격자의 목표 위치(사분면 조건 만족)'} 곳을 탭해 안테나를 정렬해 주세요.</p>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
                     `;
@@ -4412,6 +4444,32 @@
                 };
 
                 renderUI();
+
+                // 상급 난이도인 경우 더미 후보 노드를 화면에 먼저 그림
+                const drawCandidateNodes = () => {
+                    if (this.difficulty === 'hard' && data.nodes) {
+                        const center = 250;
+                        const step = 50;
+                        data.nodes.forEach(node => {
+                            const markerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                            markerGroup.setAttribute("class", "candidate-node");
+                            markerGroup.setAttribute("style", "pointer-events: none;");
+
+                            const bgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                            bgCircle.setAttribute("cx", center + node.x * step);
+                            bgCircle.setAttribute("cy", center - node.y * step);
+                            bgCircle.setAttribute("r", 15);
+                            bgCircle.setAttribute("fill", "rgba(0, 255, 255, 0.15)");
+                            bgCircle.setAttribute("stroke", "rgba(0, 255, 255, 0.6)");
+                            bgCircle.setAttribute("stroke-width", "1.5");
+                            bgCircle.setAttribute("stroke-dasharray", "3,3");
+                            
+                            markerGroup.appendChild(bgCircle);
+                            svg.appendChild(markerGroup);
+                        });
+                    }
+                };
+                drawCandidateNodes();
 
                 const drawAntennaMarkers = () => {
                     const oldAntennas = svg.querySelectorAll('.antenna-marker');
@@ -4473,14 +4531,26 @@
                     const xVal = Math.round((xPx - center) / step);
                     const yVal = Math.round(-(yPx - center) / step);
 
-                    if (xVal === 0 || yVal === 0) {
+                    if (this.difficulty !== 'hard' && (xVal === 0 || yVal === 0)) {
                         this.audio.playSFX('fail');
                         alert("경계선(x축 또는 y축) 위에는 안테나를 정렬할 수 없습니다. 빈 사분면 영역에 배치하십시오.");
                         return;
                     }
 
+                    if (this.difficulty === 'hard') {
+                        // 상급의 경우 후보 노드 위치에만 스냅
+                        const snappedNode = data.nodes.find(n => Math.abs(n.x - xVal) <= 1 && Math.abs(n.y - yVal) <= 1);
+                        if (!snappedNode) {
+                            this.audio.playSFX('fail');
+                            alert("화면에 표시된 점선 원(후보 노드) 근처를 터치하십시오.");
+                            return;
+                        }
+                        this.userInputs[selectedChipId] = { x: snappedNode.x, y: snappedNode.y };
+                    } else {
+                        this.userInputs[selectedChipId] = { x: xVal, y: yVal };
+                    }
+
                     this.audio.playSFX('click');
-                    this.userInputs[selectedChipId] = { x: xVal, y: yVal };
                     selectedChipId = null;
 
                     renderUI();
@@ -4505,8 +4575,17 @@
                 
                 data.chips.forEach(chip => {
                     const coord = this.userInputs[chip.id];
-                    if (coord && chip.check(coord.x, coord.y)) {
-                        correctCount++;
+                    if (coord) {
+                        if (this.difficulty === 'hard') {
+                            const targetNode = data.nodes.find(n => n.id === chip.targetNodeId);
+                            if (targetNode && coord.x === targetNode.x && coord.y === targetNode.y) {
+                                correctCount++;
+                            }
+                        } else {
+                            if (chip.check(coord.x, coord.y)) {
+                                correctCount++;
+                            }
+                        }
                     }
                 });
 
