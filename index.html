@@ -4669,11 +4669,7 @@
             typeIntroText();
         }
 
-        if (document.readyState === 'loading') {
-            window.addEventListener('DOMContentLoaded', initGameAndIntro);
-        } else {
-            initGameAndIntro();
-        }
+        initGameAndIntro();
     </script>
 
 </body>
