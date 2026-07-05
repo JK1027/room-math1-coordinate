@@ -1127,7 +1127,27 @@
     <!-- MAIN GAME SCRIPT -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
-            alert("JS Error: " + message + " at line " + lineno + ":" + colno + "\nSource: " + source);
+            const errDiv = document.createElement('div');
+            errDiv.style.position = 'fixed';
+            errDiv.style.top = '0';
+            errDiv.style.left = '0';
+            errDiv.style.width = '100%';
+            errDiv.style.background = 'red';
+            errDiv.style.color = 'white';
+            errDiv.style.zIndex = '99999';
+            errDiv.style.padding = '10px';
+            errDiv.style.fontFamily = 'monospace';
+            errDiv.style.fontSize = '12px';
+            errDiv.style.whiteSpace = 'pre-wrap';
+            errDiv.innerText = "JS Error: " + message + "\nLine: " + lineno + ":" + colno + "\nSource: " + source + "\nStack: " + (error ? error.stack : 'N/A');
+            
+            if (document.body) {
+                document.body.appendChild(errDiv);
+            } else {
+                window.addEventListener('DOMContentLoaded', () => {
+                    document.body.appendChild(errDiv);
+                });
+            }
             return false;
         };
 
