@@ -1979,10 +1979,10 @@
                     hard: "반비례 상수 a를 먼저 구해야 합니다. x * y = a 에서 기압 수평선 목표 y가 주어졌으니, x = a / y 공식을 활용해 대입하세요."
                 },
                 generateMissionData: function(difficulty, randomize) {
-                    let a = 6;
+                    let a = 4;
                     let targetY = 2;
                     if (randomize) {
-                        const aPool = [4, 6, 8, 10];
+                        const aPool = [4, 6, 8];
                         a = aPool[Math.floor(Math.random() * aPool.length)];
                         let divisors = [];
                         for(let i=2; i<=a/2; i++) {
