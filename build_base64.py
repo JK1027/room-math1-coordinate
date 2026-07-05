@@ -1,7 +1,7 @@
 import base64
 import re
 
-with open('index.html', 'r', encoding='utf-8') as f:
+with open('index_src.html', 'r', encoding='utf-8') as f:
     html = f.read()
 
 # 메인 스크립트를 분리하기 위한 정규식
