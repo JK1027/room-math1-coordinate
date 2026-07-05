@@ -927,17 +927,19 @@
 
         @keyframes border-pulse {
             0%, 100% { 
-                border-color: var(--border-neon);
-                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 240, 255, 0.05);
+                border-color: var(--neon-cyan);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.05);
             }
             50% { 
-                border-color: rgba(0, 240, 255, 0.8);
-                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.35), inset 0 0 15px rgba(0, 240, 255, 0.15);
+                border-color: var(--neon-magenta);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 0, 127, 0.8), inset 0 0 20px rgba(255, 0, 127, 0.3);
+                background: rgba(255, 0, 127, 0.08) !important;
             }
         }
         .npc-box-waiting {
-            animation: border-pulse 1.8s infinite ease-in-out;
+            animation: border-pulse 1.2s infinite ease-in-out;
             cursor: pointer;
+            border-width: 1.5px !important;
         }
 
         /* 모바일 세로모드(스마트폰 해상도) 완전 최적화 - 스타일 상속을 받기 위해 CSS 최하단에 배치 */
@@ -3065,7 +3067,7 @@
                         const txt = dialogs[dIdx];
                         
                         const showClickPrompt = () => {
-                            dialogText.innerHTML += '<span class="dialog-cursor"> ↩</span>';
+                            dialogText.innerHTML += '<span class="dialog-cursor"> ↩ [터치하여 계속]</span>';
                             newChatPanel.classList.add('npc-box-waiting');
                         };
 
